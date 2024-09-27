@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Http\Middleware\CheckPersonaRegistration;
+use Illuminate\Foundation\Configuration\Middleware;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        //
-    }
+{
+    $this->app->make(Middleware::class)->web(append: [
+        CheckPersonaRegistration::class,
+    ]);
+}
 }
