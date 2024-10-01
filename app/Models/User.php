@@ -10,49 +10,50 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    public function persona()
-    {
-        return $this->hasOne(Personas::class);
-    }
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role_id',  // Añadimos role_id a los campos llenables
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    // app/Models/User.php
-public function role()
-{
-    return $this->belongsTo(Roles::class);
-}
 
-public function hasRole($role)
-{
-    return $this->role->name === $role;
-}
+    public function persona()
+    {
+        return $this->hasOne(Personas::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Roles::class);
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role->name === $role;
+    }
+
+    public function esInstructor()
+    {
+        return $this->hasRole('instructor');
+    }
+
+    public function esAprendiz()
+    {
+        return $this->hasRole('aprendiz');
+    }
+
+    public function esAdministrador()
+    {
+        return $this->hasRole('admin');
+    }
 }

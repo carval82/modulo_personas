@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="container">
-    <h2>Editar Persona</h2>
-    <form method="POST" action="{{ route('personas.update', $persona->id) }}">
+    <h1>Editar Persona</h1>
+    <form action="{{ route('personas.update', $persona->id) }}" method="POST">
         @csrf
         @method('PUT')
         
@@ -46,23 +46,33 @@
             <label for="direccion">Dirección</label>
             <input type="text" class="form-control" id="direccion" name="direccion" value="{{ $persona->direccion }}" required>
         </div>
-
-        <div class="form-group">
-            <label for="rol_id">Rol</label>
-            <select class="form-control" id="rol_id" name="rol_id" required>
-            @foreach($roles as $rol)
-        @if(is_object($rol))
-        <option value="{{ $rol->id }}" {{ optional($persona)->rol_id == $rol->id ? 'selected' : '' }}>
-            {{ $rol->descripcion }}
-        </option>
-    @endif
-@endforeach
-            </select>
+        <div>
+            
+            <p>Rol actual de la persona: 
+                {{ optional($persona->user)->role_id ? 
+                   $roles->firstWhere('id', optional($persona->user)->role_id)->name ?? 'No encontrado' : 
+                   'No asignado' }}
+            </p>
         </div>
 
         <div class="form-group">
+            <label for="rol_id">Rol</label>
+            @if($canChangeRole)
+                <select name="rol_id" id="rol_id" class="form-control">
+                    @foreach($roles as $rol)
+                        <option value="{{ $rol->id }}" {{ ($persona->user->role_id == $rol->id) ? 'selected' : '' }}>
+                            {{ $rol->name }}
+                        </option>
+                    @endforeach
+                </select>
+            @else
+                <input type="text" class="form-control" value="{{ $persona->user->role->name }}" readonly>
+                <input type="hidden" name="rol_id" value="{{ $persona->user->role_id }}">
+            @endif
+        <div class="form-group">
             <label for="tipo_sangre_id">Tipo de Sangre</label>
             <select class="form-control" id="tipo_sangre_id" name="tipo_sangre_id" required>
+                <option value="">Seleccione un tipo de sangre</option>
                 @foreach($gruposSanguineos as $grupo)
                     <option value="{{ $grupo->id }}" {{ $persona->tipo_sangre_id == $grupo->id ? 'selected' : '' }}>
                         {{ $grupo->descripcion }}
@@ -72,25 +82,42 @@
         </div>
 
         <div class="form-group">
-    <label for="tipo_contrato_id">Tipo de Contrato</label>
-    <select class="form-control" id="tipo_contrato_id" name="tipo_contrato_id" required>
-    @if(is_array($tiposContratos) || is_object($tiposContratos))
-        @foreach($tiposContratos as $contrato)
-            @php
-                $contratoId = is_object($contrato) ? $contrato->id : ($contrato['id'] ?? null);
-                $contratoDescripcion = is_object($contrato) ? $contrato->descripcion : ($contrato['descripcion'] ?? '');
-            @endphp
-            <option value="{{ $contratoId }}" {{ $persona->tipo_contrato_id == $contratoId ? 'selected' : '' }}>
-                {{ $contratoDescripcion }}
-            </option>
-        @endforeach
-    @else
-        <option value="">No hay tipos de contrato disponibles</option>
-    @endif
-    </select>
-</div>
+            <label for="tipo_contrato_id">Tipo de Contrato</label>
+            <select class="form-control" id="tipo_contrato_id" name="tipo_contrato_id" required>
+                <option value="">Seleccione un tipo de contrato</option>
+                @foreach($tiposContratos as $contrato)
+                    <option value="{{ $contrato->id }}" {{ $persona->tipo_contrato_id == $contrato->id ? 'selected' : '' }}>
+                        {{ $contrato->descripcion }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+       
+
+<div class="form-group">
+        <input type="hidden" name="change_password" value="0">
+        <label>
+            <input type="checkbox" name="change_password" value="1" id="change_password"> Cambiar contraseña
+        </label>
+    </div>
+
+    <div id="password_fields" style="display: none;">
+        <div class="form-group">
+            <label for="password">Nueva contraseña</label>
+            <input type="password" name="password" id="password" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password_confirmation">Confirmar nueva contraseña</label>
+            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
+        </div>
+    </div>
 
         <button type="submit" class="btn btn-primary">Actualizar</button>
+        <script>
+    document.getElementById('change_password').addEventListener('change', function() {
+        document.getElementById('password_fields').style.display = this.checked ? 'block' : 'none';
+    });
+</script>
     </form>
 </div>
 @endsection

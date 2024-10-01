@@ -71,45 +71,26 @@
         </div>
 
         <div class="form-group">
-            <label>Rol</label>
-            <div>
-                @foreach(['Coordinador' => 1,  'Instructor' => 2, 'Aprendiz' => 3] as $rol => $value)
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="rol_id" id="rol_{{ $value }}" value="{{ $value }}" {{ old('rol_id') == $value ? 'checked' : '' }} required>
-                        <label class="form-check-label" for="rol_{{ $value }}">{{ $rol }}</label>
-                    </div>
+            <label for="tipo_sangre_id">Grupo Sanguíneo</label>
+            <select class="form-control" name="tipo_sangre_id" id="tipo_sangre_id" required>
+                <option value="">Seleccione un grupo sanguíneo</option>
+                @foreach($gruposSanguineos as $id => $descripcion)
+                    <option value="{{ $id }}" {{ old('tipo_sangre_id') == $id ? 'selected' : '' }}>{{ $descripcion }}</option>
                 @endforeach
-            </div>
-            @error('rol_id')
-                <small class="text-danger">{{ $message }}</small>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label>Grupo Sanguíneo</label>
-            <div>
-                @foreach(['A+' => 1, 'A-' => 2, 'B+' => 3, 'B-' => 4, 'AB+' => 5, 'AB-' => 6, 'O+' => 7, 'O-' => 8] as $tipo => $value)
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tipo_sangre_id" id="tipo_sangre_{{ $value }}" value="{{ $value }}" {{ old('tipo_sangre_id') == $value ? 'checked' : '' }} required>
-                        <label class="form-check-label" for="tipo_sangre_{{ $value }}">{{ $tipo }}</label>
-                    </div>
-                @endforeach
-            </div>
+            </select>
             @error('tipo_sangre_id')
                 <small class="text-danger">{{ $message }}</small>
             @enderror
         </div>
 
         <div class="form-group">
-            <label>Tipo de Contrato</label>
-            <div>
-                @foreach(['Vinculado' => 1, 'Contratista' => 2] as $tipo => $value)
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tipo_contrato_id" id="contrato_{{ $value }}" value="{{ $value }}" {{ old('tipo_contrato_id') == $value ? 'checked' : '' }} required>
-                        <label class="form-check-label" for="contrato_{{ $value }}">{{ $tipo }}</label>
-                    </div>
+            <label for="tipo_contrato_id">Tipo de Contrato</label>
+            <select class="form-control" name="tipo_contrato_id" id="tipo_contrato_id" required>
+                <option value="">Seleccione un tipo de contrato</option>
+                @foreach($tiposContratos as $id => $descripcion)
+                    <option value="{{ $id }}" {{ old('tipo_contrato_id') == $id ? 'selected' : '' }}>{{ $descripcion }}</option>
                 @endforeach
-            </div>
+            </select>
             @error('tipo_contrato_id')
                 <small class="text-danger">{{ $message }}</small>
             @enderror

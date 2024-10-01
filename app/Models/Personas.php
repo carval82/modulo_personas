@@ -11,18 +11,13 @@ class Personas extends Model
 
     protected $fillable = [
         'documento', 'pnombre', 'snombre', 'papellido', 'sapellido',
-        'telefono', 'correo', 'direccion', 'rol_id', 'tipo_sangre_id',
+        'telefono', 'correo', 'direccion', 'tipo_sangre_id',
         'tipo_contrato_id', 'user_id'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function rol()
-    {
-        return $this->belongsTo(Roles::class, 'rol_id');
     }
 
     public function grupoSanguineo()
@@ -35,25 +30,23 @@ class Personas extends Model
         return $this->belongsTo(Contratos::class, 'tipo_contrato_id');
     }
 
+    public function rol()
+    {
+        return $this->user ? $this->user->role() : null;
+    }
+
     public function esInstructor()
     {
-        return $this->rol->name === 'instructor';
+        return $this->user && $this->user->role && $this->user->role->name === 'instructor';
     }
 
     public function esAprendiz()
     {
-        return $this->rol->name === 'aprendiz';
+        return $this->user && $this->user->role && $this->user->role->name === 'aprendiz';
     }
 
     public function esAdministrador()
     {
-        return $this->rol->name === 'admin';
-    }
-
-    public function scopeInstructores($query)
-    {
-        return $query->whereHas('rol', function($q) {
-            $q->where('name', 'instructor');
-        });
+        return $this->user && $this->user->role && $this->user->role->name === 'admin';
     }
 }

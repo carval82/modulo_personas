@@ -10,8 +10,8 @@
             <p class="card-text"><strong>Documento:</strong> {{ $persona->documento }}</p>
             <p class="card-text"><strong>Primer Nombre:</strong> {{ $persona->pnombre }}</p>
             <p class="card-text"><strong>Segundo Nombre:</strong> {{ $persona->snombre ?? 'N/A' }}</p>
-            <p class="card-text"><strong>Primer Apellido:</strong> {{ $persona->papelido }}</p>
-            <p class="card-text"><strong>Segundo Apellido:</strong> {{ $persona->sapelido ?? 'N/A' }}</p>
+            <p class="card-text"><strong>Primer Apellido:</strong> {{ $persona->papellido }}</p>
+            <p class="card-text"><strong>Segundo Apellido:</strong> {{ $persona->sapellido ?? 'N/A' }}</p>
             <p class="card-text"><strong>Teléfono:</strong> {{ $persona->telefono }}</p>
             <p class="card-text"><strong>Correo:</strong> {{ $persona->correo }}</p>
             <p class="card-text"><strong>Dirección:</strong> {{ $persona->direccion }}</p>

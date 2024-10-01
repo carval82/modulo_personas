@@ -39,12 +39,18 @@
                     <td>{{ $persona->documento }}</td>
                     <td>{{ $persona->pnombre }}</td>
                     <td>{{ $persona->snombre }}</td>
-                    <td>{{ $persona->papelido }}</td>
-                    <td>{{ $persona->sapelido }}</td>
+                    <td>{{ $persona->papellido }}</td>
+                    <td>{{ $persona->sapellido }}</td>
                     <td>{{ $persona->telefono }}</td>
                     <td>{{ $persona->correo }}</td>
                     <td>{{ $persona->direccion }}</td>
-                    <td>{{ $persona->rol->descripcion ?? 'N/A' }}</td>
+                    <td>
+                        @if($persona->user && $persona->user->role)
+                            {{ $persona->user->role->descripcion }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
                     <td>{{ $persona->grupoSanguineo->descripcion ?? 'N/A' }}</td>
                     <td>{{ $persona->tipoContrato->descripcion ?? 'N/A' }}</td>
                     <td>{{ $persona->created_at->format('Y-m-d H:i:s') }}</td>
