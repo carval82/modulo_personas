@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use App\Models\User;
+use App\Models\Personas;
 use App\Models\Roles;
+use App\Models\Grupo_sanguineo;
+use App\Models\Contratos;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
     use RegistersUsers;
 
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/home';  // Ajusta esta ruta según tus necesidades
 
     public function __construct()
     {
@@ -29,40 +32,59 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role_id' => ['required', 'exists:roles,id'],
+            'documento' => ['required', 'string', 'max:20', 'unique:personas'],
+            'pnombre' => ['required', 'string', 'max:50'],
+            'snombre' => ['nullable', 'string', 'max:50'],
+            'papellido' => ['required', 'string', 'max:50'],
+            'sapellido' => ['nullable', 'string', 'max:50'],
+            'telefono' => ['required', 'string', 'max:20'],
+            'direccion' => ['required', 'string', 'max:255'],
+            'tipo_sangre_id' => ['required', 'exists:grupo_sanguineos,id'],
+            'tipo_contrato_id' => ['required', 'exists:contratos,id'],
+            'rol_id' => ['required', 'exists:roles,id'],
         ]);
     }
 
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role_id' => $data['role_id'],
-        ]);
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role_id' => $data['rol_id'],
+            ]);
+
+            $persona = Personas::create([
+                'documento' => $data['documento'],
+                'pnombre' => $data['pnombre'],
+                'snombre' => $data['snombre'],
+                'papellido' => $data['papellido'],
+                'sapellido' => $data['sapellido'],
+                'telefono' => $data['telefono'],
+                'correo' => $data['email'],
+                'direccion' => $data['direccion'],
+                'tipo_sangre_id' => $data['tipo_sangre_id'],
+                'tipo_contrato_id' => $data['tipo_contrato_id'],
+                'user_id' => $user->id,
+            ]);
+
+            DB::commit();
+            return $user;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear usuario y persona: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function showRegistrationForm()
     {
-        $roles = Roles::where('name', '!=', 'admin')->pluck('name', 'id');
-        return view('auth.register', compact('roles'));
-    }
-
-    public function register(Request $request)
-    {
-        $this->validator($request->all())->validate();
-
-        event(new Registered($user = $this->create($request->all())));
-
-        $this->guard()->login($user);
-
-        return $this->registered($request, $user)
-                    ?: redirect()->route('personas.create');
-    }
-
-    protected function registered(Request $request, $user)
-    {
-        return redirect()->route('personas.create');
+        $roles = Roles::select('id', 'name', 'descripcion')->get();
+        $gruposSanguineos = Grupo_sanguineo::select('id', 'descripcion')->get();
+        $tiposContratos = Contratos::select('id', 'descripcion')->get();
+        return view('auth.register', compact('roles', 'gruposSanguineos', 'tiposContratos'));
     }
 }

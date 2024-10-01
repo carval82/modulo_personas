@@ -11,7 +11,8 @@ use App\Models\Contratos;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\User;
+use App\Models\Persona;
 
 class PersonasController extends Controller
 {
@@ -26,18 +27,30 @@ class PersonasController extends Controller
         return view('personas.index', compact('personas'));
     }
 
-    public function create()
-    {
-        if (Auth::user()->persona) {
-            return redirect()->route('home')->with('error', 'Ya tienes un perfil de persona creado.');
-        }
-        
-        // Ya no necesitamos pasar los roles al formulario
-        $gruposSanguineos = Grupo_sanguineo::pluck('descripcion', 'id');
-        $tiposContratos = Contratos::pluck('descripcion', 'id');
-        
-        return view('personas.create', compact('gruposSanguineos', 'tiposContratos'));
-    }
+    protected function create(array $data)
+{
+    $user = User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password']),
+    ]);
+
+    $persona = Personas::create([
+        'documento' => $data['documento'],
+        'pnombre' => $data['pnombre'],
+        'snombre' => $data['snombre'],
+        'papellido' => $data['papellido'],
+        'sapellido' => $data['sapellido'],
+        'telefono' => $data['telefono'],
+        'correo' => $data['email'],
+        'direccion' => $data['direccion'],
+        'tipo_sangre_id' => $data['tipo_sangre_id'],
+        'tipo_contrato_id' => $data['tipo_contrato_id'],
+        'user_id' => $user->id,
+    ]);
+
+    return $user;
+}
 
     public function store(Request $request)
     {
