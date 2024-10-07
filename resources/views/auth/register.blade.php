@@ -163,40 +163,39 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
-                            <label for="tipo_contrato_id" class="col-md-4 col-form-label text-md-right">{{ __('Tipo de Contrato') }}</label>
-                            <div class="col-md-6">
-                                <select id="tipo_contrato_id" class="form-control @error('tipo_contrato_id') is-invalid @enderror" name="tipo_contrato_id" required>
-                                    <option value="">Seleccione un tipo de contrato</option>
-                                    @foreach($tiposContratos as $tipoContrato)
-                                        <option value="{{ $tipoContrato->id }}">{{ $tipoContrato->descripcion }}</option>
-                                    @endforeach
-                                </select>
-                                @error('tipo_contrato_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+                       
 
                         <div class="form-group row">
-                            <label for="rol_id" class="col-md-4 col-form-label text-md-right">{{ __('Rol') }}</label>
-                            <div class="col-md-6">
-                                <select id="rol_id" class="form-control @error('rol_id') is-invalid @enderror" name="rol_id" required>
-                                    <option value="">Seleccione un rol</option>
-                                    @foreach($roles as $rol)
-                                        <option value="{{ $rol->id }}">{{ $rol->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('rol_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+    <label for="rol_id" class="col-md-4 col-form-label text-md-right">{{ __('Rol') }}</label>
+    <div class="col-md-6">
+        <select id="rol_id" class="form-control @error('rol_id') is-invalid @enderror" name="rol_id" required>
+            @foreach($roles as $role)
+                <option value="{{ $role->id }}">{{ $role->name }}</option>
+            @endforeach
+        </select>
+        @error('rol_id')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+</div>
 
+<div id="tipo_contrato_container" class="form-group row">
+    <label for="tipo_contrato_id" class="col-md-4 col-form-label text-md-right">{{ __('Tipo de Contrato') }}</label>
+    <div class="col-md-6">
+        <select id="tipo_contrato_id" class="form-control @error('tipo_contrato_id') is-invalid @enderror" name="tipo_contrato_id">
+            @foreach($tiposContratos as $contrato)
+                <option value="{{ $contrato->id }}">{{ $contrato->descripcion }}</option>
+            @endforeach
+        </select>
+        @error('tipo_contrato_id')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+</div>
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
@@ -210,4 +209,29 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const rolSelect = document.getElementById('rol_id');
+    const tipoContratoContainer = document.getElementById('tipo_contrato_container');
+    const tipoContratoSelect = document.getElementById('tipo_contrato_id');
+
+    function toggleTipoContrato() {
+        const selectedRole = rolSelect.options[rolSelect.selectedIndex].text.toLowerCase();
+        if (selectedRole === 'aprendiz') {
+            tipoContratoContainer.style.display = 'none';
+            tipoContratoSelect.value = '';
+            tipoContratoSelect.required = false;
+        } else {
+            tipoContratoContainer.style.display = 'flex';
+            tipoContratoSelect.required = true;
+        }
+    }
+
+    rolSelect.addEventListener('change', toggleTipoContrato);
+    toggleTipoContrato(); // Llamada inicial para establecer el estado correcto
+});
+</script>
 @endsection

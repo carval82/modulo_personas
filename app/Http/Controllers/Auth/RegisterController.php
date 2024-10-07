@@ -27,62 +27,73 @@ class RegisterController extends Controller
     }
 
     protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'documento' => ['required', 'string', 'max:20', 'unique:personas'],
-            'pnombre' => ['required', 'string', 'max:50'],
-            'snombre' => ['nullable', 'string', 'max:50'],
-            'papellido' => ['required', 'string', 'max:50'],
-            'sapellido' => ['nullable', 'string', 'max:50'],
-            'telefono' => ['required', 'string', 'max:20'],
-            'direccion' => ['required', 'string', 'max:255'],
-            'tipo_sangre_id' => ['required', 'exists:grupo_sanguineos,id'],
-            'tipo_contrato_id' => ['required', 'exists:contratos,id'],
-            'rol_id' => ['required', 'exists:roles,id'],
+{
+    $rules = [
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        'password' => ['required', 'string', 'min:8', 'confirmed'],
+        'documento' => ['required', 'string', 'max:20', 'unique:personas'],
+        'pnombre' => ['required', 'string', 'max:50'],
+        'snombre' => ['nullable', 'string', 'max:50'],
+        'papellido' => ['required', 'string', 'max:50'],
+        'sapellido' => ['nullable', 'string', 'max:50'],
+        'telefono' => ['required', 'string', 'max:20'],
+        'direccion' => ['required', 'string', 'max:255'],
+        'tipo_sangre_id' => ['required', 'exists:grupo_sanguineos,id'],
+        'rol_id' => ['required', 'exists:roles,id'],
+    ];
+
+    // Verifica si el rol es diferente de aprendiz
+    if (!isset($data['rol_id']) || Roles::find($data['rol_id'])->name !== 'aprendiz') {
+        $rules['tipo_contrato_id'] = ['required', 'exists:contratos,id'];
+    }
+
+    return Validator::make($data, $rules);
+}
+
+protected function create(array $data)
+{
+    try {
+        DB::beginTransaction();
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role_id' => $data['rol_id'],
         ]);
-    }
 
-    protected function create(array $data)
-    {
-        try {
-            DB::beginTransaction();
+        $personaData = [
+            'documento' => $data['documento'],
+            'pnombre' => $data['pnombre'],
+            'snombre' => $data['snombre'],
+            'papellido' => $data['papellido'],
+            'sapellido' => $data['sapellido'],
+            'telefono' => $data['telefono'],
+            'correo' => $data['email'],
+            'direccion' => $data['direccion'],
+            'tipo_sangre_id' => $data['tipo_sangre_id'],
+            'user_id' => $user->id,
+        ];
 
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'role_id' => $data['rol_id'],
-            ]);
-
-            $persona = Personas::create([
-                'documento' => $data['documento'],
-                'pnombre' => $data['pnombre'],
-                'snombre' => $data['snombre'],
-                'papellido' => $data['papellido'],
-                'sapellido' => $data['sapellido'],
-                'telefono' => $data['telefono'],
-                'correo' => $data['email'],
-                'direccion' => $data['direccion'],
-                'tipo_sangre_id' => $data['tipo_sangre_id'],
-                'tipo_contrato_id' => $data['tipo_contrato_id'],
-                'user_id' => $user->id,
-            ]);
-
-            DB::commit();
-            return $user;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error al crear usuario y persona: ' . $e->getMessage());
-            throw $e;
+        if (Roles::find($data['rol_id'])->name !== 'aprendiz') {
+            $personaData['tipo_contrato_id'] = $data['tipo_contrato_id'];
         }
+
+        $persona = Personas::create($personaData);
+
+        DB::commit();
+        return $user;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error al crear usuario y persona: ' . $e->getMessage());
+        throw $e;
     }
+}
 
     public function showRegistrationForm()
     {
-        $roles = Roles::select('id', 'name', 'descripcion')->get();
+        $roles = Roles::whereIn('name', ['aprendiz', 'instructor'])->select('id', 'name', 'descripcion')->get();
         $gruposSanguineos = Grupo_sanguineo::select('id', 'descripcion')->get();
         $tiposContratos = Contratos::select('id', 'descripcion')->get();
         return view('auth.register', compact('roles', 'gruposSanguineos', 'tiposContratos'));

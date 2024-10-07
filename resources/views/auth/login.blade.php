@@ -6,11 +6,15 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <img src="{{ asset('/img/imagen.jpg') }}" alt="Imagen SENA" class="img-fluid w-100">
+                    
                 </div>
 
-                <div class="card-body">
-                    <h2>Iniciar sesión</h2>
+                <div class="card-body row justify-content-center" >
+                <div class="container justify-center">
+                <img src="{{ asset('/img/imagen.jpg') }}" alt="Imagen SENA" class="img-fluid w-50">
+                </div>
+                <div class="container2">
+                <h2>Iniciar sesión</h2>
 
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
@@ -62,6 +66,7 @@
                                 </button>
                             </div>
                         </div>
+
                     </form>
 
                     <div class="mt-3">
