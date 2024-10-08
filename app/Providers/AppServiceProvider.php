@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Http\Middleware\CheckPersonaRegistration;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AdminMiddleware;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     $this->app->make(Middleware::class)->web(append: [
         CheckPersonaRegistration::class,
     ]);
+    Route::aliasMiddleware('admin', AdminMiddleware::class);
 }
 }

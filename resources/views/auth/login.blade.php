@@ -13,7 +13,7 @@
                 <div class="container justify-center">
                 <img src="{{ asset('/img/imagen.jpg') }}" alt="Imagen SENA" class="img-fluid w-50">
                 </div>
-                <div class="container2">
+                <div class="container">
                 <h2>Iniciar sesión</h2>
 
                     <form method="POST" action="{{ route('login') }}">
